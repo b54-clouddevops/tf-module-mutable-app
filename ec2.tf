@@ -7,12 +7,12 @@ resource "aws_spot_instance_request" "spot" {
   vpc_security_group_ids     = [aws_security_group.allows_app.id]
   subnet_id                  = element(data.terraform_remote_state.vpc.outputs.PRIVATE_SUBNET_IDS, count.index)
   wait_for_fulfillment       = true
-
+  
+  # This creates requests to the request
   tags = {
     Name = "${var.COMPONENT}-${var.ENV}"
   }
 }
-
 
 # Creates On-demand Backend Component
 resource "aws_instance" "od" {
@@ -38,10 +38,15 @@ resource "aws_instance" "od" {
 #       "ansible-pull -U https://github.com/b54-clouddevops/ansible.git -e ENV=dev -e COMPONENT=${var.COMPONENT} -e APP_VERSION=${var.APP_VERSION} roboshop-pull.yml"
 #     ]
 #   }
+}
 
 
-  tags = {
-    Name = "${var.COMPONENT}-${var.ENV}"
-  }
-  
+
+# Creating tag and attaching it to the Instances 
+resource "aws_ec2_tag" "tags" {
+  count       = var.OD_INSTANCE_COUNT + var.SPOT_INSTANCE_COUNT
+
+  resource_id = concat(aws_spot_instance_request.spot.*.spot_instance_id, aws_instance.od.*.id)
+  key         = "Name"
+  value       = "${var.COMPONENT}-${var.ENV}"
 }
