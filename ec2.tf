@@ -22,33 +22,19 @@ resource "aws_instance" "od" {
   instance_type              = var.OD_INSTANCE_TYPE
   vpc_security_group_ids     = [aws_security_group.allows_app.id]
   subnet_id                  = element(data.terraform_remote_state.vpc.outputs.PRIVATE_SUBNET_IDS, count.index)
-
-  # This will be executed on the top of the machine once it's created
-#   provisioner "remote-exec" {
-
-#     # connection block establishes connection to this
-#     connection {
-#       type     = "ssh"
-#       user     = "centos"
-#       password = "DevOps321"
-#       host     = self.private_ip             # aws_instance.sample.private_ip : Use this only if your provisioner is outside the resource.
-#     }
-
-#     inline = [
-#       "ansible-pull -U https://github.com/b54-clouddevops/ansible.git -e ENV=dev -e COMPONENT=${var.COMPONENT} -e APP_VERSION=${var.APP_VERSION} roboshop-pull.yml"
-#     ]
-#   }
 }
 
 locals {
-    INSTANCE_IDS    =   concat(aws_spot_instance_request.spot.*.spot_instance_id, aws_instance.od.*.id)
+    INSTANCE_IDS             =  concat(aws_spot_instance_request.spot.*.spot_instance_id, aws_instance.od.*.id)
+    INSTANCE_COUNT           =  var.OD_INSTANCE_COUNT + var.SPOT_INSTANCE_COUNT
+    INSTANCE_IPS             =  concat(aws_spot_instance_request.spot.*.private_ip, aws_instance.od.*.private_ip)
 }
 
 # Creating tag and attaching it to the Instances 
 resource "aws_ec2_tag" "tags" {
-  count       = var.OD_INSTANCE_COUNT + var.SPOT_INSTANCE_COUNT
+  count                     = local.INSTANCE_COUNT
 
-  resource_id = element(local.INSTANCE_IDS, count.index)
-  key         = "Name"
-  value       = "${var.COMPONENT}-${var.ENV}"
+  resource_id               = element(local.INSTANCE_IDS, count.index)
+  key                       = "Name"
+  value                     = "${var.COMPONENT}-${var.ENV}"
 }
