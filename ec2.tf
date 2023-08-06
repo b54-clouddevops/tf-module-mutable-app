@@ -38,4 +38,10 @@ resource "aws_instance" "od" {
 #       "ansible-pull -U https://github.com/b54-clouddevops/ansible.git -e ENV=dev -e COMPONENT=${var.COMPONENT} -e APP_VERSION=${var.APP_VERSION} roboshop-pull.yml"
 #     ]
 #   }
+
+
+  tags = {
+    Name = "${var.COMPONENT}-${var.ENV}"
+  }
+  
 }
