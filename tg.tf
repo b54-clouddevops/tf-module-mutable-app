@@ -25,7 +25,7 @@ resource "aws_lb_target_group_attachment" "attach_instances" {
 
 # Generates Random Number 
 resource "random_integer" "priority" {
-    max = 100
+    max = 105
     min = 500
 }
 
