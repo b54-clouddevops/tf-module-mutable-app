@@ -7,6 +7,7 @@ resource "aws_spot_instance_request" "spot" {
   vpc_security_group_ids     = [aws_security_group.allows_app.id]
   subnet_id                  = element(data.terraform_remote_state.vpc.outputs.PRIVATE_SUBNET_IDS, count.index)
   wait_for_fulfillment       = true
+  iam_instance_profile       = "b54-admin"
   
   # This creates requests to the request
   tags = {
@@ -22,6 +23,7 @@ resource "aws_instance" "od" {
   instance_type              = var.OD_INSTANCE_TYPE
   vpc_security_group_ids     = [aws_security_group.allows_app.id]
   subnet_id                  = element(data.terraform_remote_state.vpc.outputs.PRIVATE_SUBNET_IDS, count.index)
+  iam_instance_profile       = "b54-admin"
 }
 
 # Creating tag and attaching it to the Instances 
