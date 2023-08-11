@@ -17,6 +17,15 @@ data "terraform_remote_state" "alb" {
   }
 }
 
+data "terraform_remote_state" "db" {
+  backend = "s3"
+  config = {
+    bucket = "b54-tf-remote-state"
+    key    = "alb/${var.ENV}/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 # Ensure you create an AMI : Using my my Lab Image [ create an instance, Install Ansible and Make an AMI and use it]
 data "aws_ami" "image" {
   most_recent      = true
