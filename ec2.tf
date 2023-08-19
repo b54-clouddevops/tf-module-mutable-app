@@ -36,3 +36,19 @@ resource "aws_ec2_tag" "tags" {
   key                       = "Name"
   value                     = "${var.COMPONENT}-${var.ENV}"
 }
+
+# Creating tag and attaching it to the Instances , so that prometheus will monitor
+resource "aws_ec2_tag" "prom_tag" {
+  count                     = local.INSTANCE_COUNT
+  resource_id               = element(local.INSTANCE_IDS, count.index)
+  key                       = "prometheus-monitor"
+  value                     = "yes"
+}
+
+# Creating tag and attaching it to the Instances , so that prometheus will monitor
+resource "aws_ec2_tag" "env" {
+  count                     = local.INSTANCE_COUNT
+  resource_id               = element(local.INSTANCE_IDS, count.index)
+  key                       = "ENV"
+  value                     = var.ENV
+}
