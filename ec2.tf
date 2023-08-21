@@ -11,7 +11,7 @@ resource "aws_spot_instance_request" "spot" {
   
   # This creates requests to the request
   tags = {
-    Name = "${var.COMPONENT}-${var.ENV}"
+    Name               = "${var.COMPONENT}-${var.ENV}"
   }
 }
 
@@ -25,7 +25,8 @@ resource "aws_instance" "od" {
   subnet_id                  = element(data.terraform_remote_state.vpc.outputs.PRIVATE_SUBNET_IDS, count.index)
   iam_instance_profile       = "b54-admin"
   tags = {
-    Name = "${var.COMPONENT}-${var.ENV}"
+    Name               = "${var.COMPONENT}-${var.ENV}"
+    prometheus-monitor = "Yes"
   }
 }
 
